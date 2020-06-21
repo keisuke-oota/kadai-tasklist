@@ -2,10 +2,7 @@ class TasksController < ApplicationController
   before_action :require_user_logged_in
   
   def index
-    if logged_in?
-      @task = current_user.tasks.build
-      @tasks = current_user.tasks.order(id: :desc).page(params[:page])
-    end
+    @tasks = current_user.tasks.order(id: :desc).page(params[:page])
   end
 
   def show
@@ -19,12 +16,14 @@ class TasksController < ApplicationController
   def create
     @task = current_user.tasks.build(task_params)
     
+    
     if @task.save
       flash[:success] = 'Task が正常に追加されました'
       redirect_to root_url
     else
+      @tasks = current_user.tasks.order(id: :desc).page(params[:page])
       flash.now[:danger] = 'Task が追加されませんでした'
-      render 'tasks/index'
+      render :index
     end
   end
 
